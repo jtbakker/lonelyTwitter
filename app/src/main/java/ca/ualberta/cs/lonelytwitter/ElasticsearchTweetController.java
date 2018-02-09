@@ -36,6 +36,8 @@ public class ElasticsearchTweetController {
                     DocumentResult result = client.execute(index);
                     if (result.isSucceeded()) {
                         tweet.setId(result.getId());
+                    } else {
+                        Log.i("Error", "Some error = (");
                     }
                 }
                 catch (Exception e) {
@@ -56,7 +58,10 @@ public class ElasticsearchTweetController {
             ArrayList<NormalTweet> tweets = new ArrayList<NormalTweet>();
 
                 // TODO Build the query
-            Search search = new Search.Builder(search_parameters[0]).addIndex("testing").addType("tweet").build();
+            String queryStart = "{\"query\": { \"term\" { \"message\": ";
+            String queryEnd = "} }}";
+            String searchQuery = search_parameters[0];
+            Search search = new Search.Builder(searchQuery).addIndex("testing").addType("tweet").build();
             try {
                // TODO get the results of the query
                 SearchResult result = client.execute(search);
