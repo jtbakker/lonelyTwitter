@@ -53,10 +53,10 @@ public class LonelyTwitterActivity extends Activity {
 				String text = bodyText.getText().toString();
 				NormalTweet newTweet = new NormalTweet(text);
 				tweetList.add(newTweet);
-				adapter.notifyDataSetChanged();
 				//saveInFile(); // TODO replace this with elastic search
 				ElasticsearchTweetController.AddTweetsTask addTweetsTask = new ElasticsearchTweetController.AddTweetsTask();
 				addTweetsTask.execute(newTweet);
+				adapter.notifyDataSetChanged();
 			}
 		});
 
@@ -67,7 +67,8 @@ public class LonelyTwitterActivity extends Activity {
 				ElasticsearchTweetController.GetTweetsTask searchTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
 				searchTweetsTask.execute(searchText);
 				try {
-					tweetList = searchTweetsTask.get();
+					tweetList.clear();
+					tweetList.addAll(searchTweetsTask.get());
 				}
 				catch (Exception e) {
 					Log.i("Error", "Failed to get tweets from async object");

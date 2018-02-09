@@ -7,6 +7,7 @@ import com.searchly.jestdroid.DroidClientConfig;
 import com.searchly.jestdroid.JestClientFactory;
 import com.searchly.jestdroid.JestDroidClient;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +28,8 @@ public class ElasticsearchTweetController {
         @Override
         protected Void doInBackground(NormalTweet... tweets) {
             verifySettings();
-
             for (NormalTweet tweet : tweets) {
                 Index index = new Index.Builder(tweet).index("testing").type("tweet").build();
-
                 try {
                     // where is the client?
                     DocumentResult result = client.execute(index);
@@ -43,7 +42,6 @@ public class ElasticsearchTweetController {
                 catch (Exception e) {
                     Log.i("Error", "The application failed to build and send the tweets");
                 }
-
             }
             return null;
         }
@@ -56,18 +54,17 @@ public class ElasticsearchTweetController {
             verifySettings();
 
             ArrayList<NormalTweet> tweets = new ArrayList<NormalTweet>();
-
                 // TODO Build the query
-            String queryStart = "{\"query\": { \"term\" { \"message\": ";
-            String queryEnd = "} }}";
-            String searchQuery = search_parameters[0];
-            Search search = new Search.Builder(searchQuery).addIndex("testing").addType("tweet").build();
+            String query = "{ \"query\": {  \"term\" : { \"message\" : \"" + search_parameters[0] + "\"}    }}";
+            Search search = new Search.Builder(query).addIndex("testing").addType("tweet").build();
             try {
                // TODO get the results of the query
                 SearchResult result = client.execute(search);
                 if (result.isSucceeded()) {
                     List<NormalTweet> foundTweets = result.getSourceAsObjectList(NormalTweet.class);
                     tweets.addAll(foundTweets);
+                } else {
+                    Log.i("Error", "Search returned no results");
                 }
             }
             catch (Exception e) {
@@ -76,9 +73,6 @@ public class ElasticsearchTweetController {
             return tweets;
         }
     }
-
-
-
 
     public static void verifySettings() {
         if (client == null) {
