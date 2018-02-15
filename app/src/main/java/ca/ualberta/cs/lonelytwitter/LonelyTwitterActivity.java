@@ -43,7 +43,7 @@ public class LonelyTwitterActivity extends Activity {
 
 		bodyText = (EditText) findViewById(R.id.body);
 		Button saveButton = (Button) findViewById(R.id.save);
-		Button searchButton = (Button) findViewById(R.id.search);
+		Button clearButton = (Button) findViewById(R.id.clear);
 		oldTweetsList = (ListView) findViewById(R.id.oldTweetsList);
 
 		saveButton.setOnClickListener(new View.OnClickListener() {
@@ -53,31 +53,12 @@ public class LonelyTwitterActivity extends Activity {
 				String text = bodyText.getText().toString();
 				NormalTweet newTweet = new NormalTweet(text);
 				tweetList.add(newTweet);
-				//saveInFile(); // TODO replace this with elastic search
-				ElasticsearchTweetController.AddTweetsTask addTweetsTask = new ElasticsearchTweetController.AddTweetsTask();
-				addTweetsTask.execute(newTweet);
+				saveInFile(); // TODO replace this with elastic search
 				adapter.notifyDataSetChanged();
 			}
 		});
 
-		searchButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				setResult(RESULT_OK);
-				String searchText = bodyText.getText().toString();
-				ElasticsearchTweetController.GetTweetsTask searchTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
-				searchTweetsTask.execute(searchText);
-				try {
-					tweetList.clear();
-					tweetList.addAll(searchTweetsTask.get());
-				}
-				catch (Exception e) {
-					Log.i("Error", "Failed to get tweets from async object");
-				}
-				adapter.notifyDataSetChanged();
-			}
-		});
 
-		/**
 		clearButton.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
@@ -87,7 +68,6 @@ public class LonelyTwitterActivity extends Activity {
 				adapter.notifyDataSetChanged();
 			}
 		});
-		**/
 
 	}
 
@@ -95,15 +75,7 @@ public class LonelyTwitterActivity extends Activity {
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		//loadFromFile(); // TODO replace this with elastic search
-		ElasticsearchTweetController.GetTweetsTask getTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
-		getTweetsTask.execute("");
-		try {
-			tweetList = getTweetsTask.get();
-		}
-		catch (Exception e) {
-			Log.i("Error", "Failed to get the tweets from the async object");
-		}
+		loadFromFile();
 		adapter = new ArrayAdapter<NormalTweet>(this, R.layout.list_item, tweetList);
 		oldTweetsList.setAdapter(adapter);
 	}
